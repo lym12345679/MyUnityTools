@@ -1,0 +1,18 @@
+{
+    "name": "Astar.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0a6aa3da08bc59344b02dd77e50bfe03"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [
+        "Editor"
+    ],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
