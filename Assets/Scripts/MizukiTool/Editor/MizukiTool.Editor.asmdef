@@ -1,9 +1,7 @@
 {
-    "name": "Astar.Editor",
+    "name": "MizukiTool.Editor",
     "rootNamespace": "",
-    "references": [
-        "GUID:0a6aa3da08bc59344b02dd77e50bfe03"
-    ],
+    "references": [],
     "includePlatforms": [
         "Editor"
     ],
