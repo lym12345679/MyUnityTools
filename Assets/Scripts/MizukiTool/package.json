@@ -1,8 +1,8 @@
 {
     "name": "com.coffee.mizukitool",
     "displayName": "mizukitool",
-    "description": "mizukitool first test",
-    "version": "0.0.4",
+    "description": "mizukitool test",
+    "version": "0.0.8",
     "unity": "2022.3",
     "license": "MIT",
     "dependencies": {}

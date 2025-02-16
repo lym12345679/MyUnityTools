@@ -13,11 +13,12 @@ namespace MizukiTool.Box
         //用字典存储所有的UIEnum和类型
         public static Dictionary<System.Type, BoxEnum> boxTypeDic = new Dictionary<System.Type, BoxEnum>
         {
-            {typeof(MessageBox),BoxEnum.MessageBox}
+
         };
         //用字典存储所有的UI预制体路径
-        public static Dictionary<BoxEnum, string> BoxPathDic = new Dictionary<BoxEnum, string>{
-            { BoxEnum.MessageBox, "UIPrefab/MessageBox" }
+        public static Dictionary<BoxEnum, string> BoxPathDic = new Dictionary<BoxEnum, string>
+        {
+
         };
     }
 }
