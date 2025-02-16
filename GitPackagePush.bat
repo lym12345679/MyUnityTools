@@ -3,8 +3,7 @@ SET ToolName=upm-mizukitool
 ::设置模块版本
 SET ToolVersion=mizukitool-0.0.4
 ::设置模块源路径
-SET ToolAssetPath=Plugin/RoneDir/Assets
-
+SET ToolAssetPath=Assets/Scripts/Astar
 ::此命令会创建一个ToolName的分支，并同步ToolAssetPath下的内容
 git subtree split --prefix=%ToolAssetPath% --branch %ToolName%
 :: 在ToolName分支设置标签ToolVersion节点
