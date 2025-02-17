@@ -65,7 +65,7 @@ namespace MizukiTool.AStar
                 {
                     //Debug.Log("Find Path");
                     if (AstarManager.Instance.UseSimplePath)
-                        Path = AstarManager.Instance.SimplizePath(Path, SelfTransform.position, TargetTransform.position);
+                        Path = AstarManager.Instance.SimplizePath(Path, SelfTransform.position);
                 }
             }
 
