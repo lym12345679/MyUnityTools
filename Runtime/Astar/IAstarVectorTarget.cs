@@ -14,7 +14,7 @@ namespace MizukiTool.AStar
                 RefreshTick += Time.deltaTime;
                 return;
             }
-            Debug.Log("CreatAstarVector");
+            //Debug.Log("CreatAstarVector");
             AstarManager.Instance.CreatAstarVector(SelfTransform.position);
             RefreshTick = 0;
         }

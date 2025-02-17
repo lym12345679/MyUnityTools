@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using static MizukiTool.AStar.AStarWrapper;
 namespace MizukiTool.AStar
 {
     public class AstarManager : MonoBehaviour
@@ -59,7 +60,7 @@ namespace MizukiTool.AStar
                 return false;
             }
         }
-        public void InitMap(int width, int height, float cellSize, Vector3 origin, int[,] mapData)
+        public void InitMap(int width, int height, float cellSize, Vector3 origin, PointMod[,] mapData)
         {
             map = new AstarMap(width, height, cellSize, origin, mapData);
         }
@@ -73,7 +74,7 @@ namespace MizukiTool.AStar
             Vector3 origin = map.GetOrigin() + new Vector3(cellSize / 2, cellSize / 2, 0);
             int width = map.GetMapWidth();
             int height = map.GetMapHeight();
-            int[,] mapData = new int[width, height];
+            PointMod[,] mapData = new PointMod[width, height];
             for (int i = 0; i < width; i++)
             {
                 //十字检测
@@ -85,7 +86,7 @@ namespace MizukiTool.AStar
                     {
                         if (h.collider != null)
                         {
-                            mapData[i, j] = 1;
+                            mapData[i, j] = 0;
                             break;
                         }
                     }
@@ -95,7 +96,7 @@ namespace MizukiTool.AStar
                     {
                         if (h.collider != null)
                         {
-                            mapData[i, j] = 1;
+                            mapData[i, j] = 0;
                             break;
                         }
                     }
@@ -177,7 +178,7 @@ namespace MizukiTool.AStar
                 RaycastHit2D hit2 = Physics2D.Raycast(startPos, nextPos - startPos, Vector3.Distance(startPos, nextPos), wallLayer);
                 if (hit1.collider == null && hit2.collider == null)
                 {
-                    Debug.Log("Remove Point:" + path[i + 1]);
+                    //Debug.Log("Remove Point:" + path[i + 1]);
                     path.RemoveAt(i + 1);
                 }
                 else
@@ -235,6 +236,29 @@ namespace MizukiTool.AStar
             return map[point.X, point.Y].Direction;
         }
         #endregion
+        #region 节点相关
+        /// <summary>
+        /// 更新CloseList中所有的AstarPoint的Mod
+        /// </summary>
+        /// <param name="astarMap">用到的地图</param>
+        /// <param name="startPos">起始点</param>
+        /// <param name="pointMods">可通行的节点Mod</param>
+        /// <param name="func">改变Point状态的函数</param>
+        /// <returns></returns>
+        public AstarMap UpdateAllAstarPonitInCloseList(AstarMap astarMap, Vector3 startPos, PointMod[] pointMods, PointParameter func)
+            => AStarWrapper.UpdateAllAstarPonitInCloseList(astarMap, startPos, pointMods, func);
+        public List<Point> GetNeighbourPoints(Vector3 position)
+        {
+            Point point = map.GetPointOnMap(position);
+            return AStarWrapper.GetNeighbourPoints(map, point);
+        }
+
+        public List<Point> GetNeighbourPoints(Point point)
+            => AStarWrapper.GetNeighbourPoints(map, point);
+
+        public Point GetPointOnMap(Vector3 position)
+            => map.GetPointOnMap(position);
+        #endregion
         #region 标注地图
         [Header("显示地图标注")]
         public bool ShowMapLableGizmos = true;
@@ -263,7 +287,7 @@ namespace MizukiTool.AStar
             {
                 for (int j = 0; j < map.GetMapHeight(); j++)
                 {
-                    if (map[i, j].Walkable != 0)
+                    if (map[i, j].Mod != 0)
                     {
                         Gizmos.color = Color.red;
                     }
