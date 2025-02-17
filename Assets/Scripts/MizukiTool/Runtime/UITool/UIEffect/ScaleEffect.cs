@@ -205,9 +205,17 @@ namespace MizukiTool.UIEffect
             isEffectFinish = false;
         }
         /// <summary>
-        /// 立刻停止位置效果
+        /// 立刻停止位置效果,并调用结束处理器
         /// </summary>
         public void FinishImmediately()
+        {
+            StartEndHander();
+            isFinishImmediately = true;
+        }
+        /// <summary>
+        /// 立刻停止位置效果
+        /// </summary>
+        public void Stop()
         {
             isFinishImmediately = true;
         }
@@ -225,7 +233,13 @@ namespace MizukiTool.UIEffect
         {
             isPause = false;
         }
-
+        /// <summary>
+        /// 立刻调用一次结束处理器
+        /// </summary>
+        public void StartEndHander()
+        {
+            this.effectEndHandler?.Invoke(this);
+        }
         #endregion
         #region 其他
         public ScaleEffect Start(Transform targetTransform)

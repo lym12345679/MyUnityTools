@@ -206,9 +206,17 @@ namespace MizukiTool.UIEffect
             isEffectFinish = false;
         }
         /// <summary>
-        /// 立刻停止位置效果
+        /// 立刻停止位置效果,并调用结束处理器
         /// </summary>
         public void FinishImmediately()
+        {
+            StartEndHandler();
+            isFinishImmediately = true;
+        }
+        /// <summary>
+        /// 立刻停止位置效果
+        /// </summary>
+        public void Stop()
         {
             isFinishImmediately = true;
         }
@@ -226,7 +234,13 @@ namespace MizukiTool.UIEffect
         {
             isPause = false;
         }
-
+        /// <summary>
+        /// 直接触发结束处理器
+        /// </summary>
+        public void StartEndHandler()
+        {
+            effectEndHandler?.Invoke(this);
+        }
         #endregion
         #region 其他
         public RotationEffect Start(Transform targetTransform)
