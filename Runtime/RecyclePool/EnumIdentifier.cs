@@ -1,7 +1,7 @@
 using System;
 namespace MizukiTool.RecyclePool
 {
-    public class EnumIdentifier
+    internal class EnumIdentifier
     {
         public Type EnumType;
         public int Value;
