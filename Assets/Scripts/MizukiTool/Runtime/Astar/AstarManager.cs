@@ -1,14 +1,13 @@
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static MizukiTool.AStar.AStarWrapper;
 namespace MizukiTool.AStar
 {
     public class AstarManager : MonoBehaviour
     {
         public static AstarManager Instance;
         public AstarMap map;
-
         public float cellSize = 1;
         public Transform StartTransform;
         public Transform EndTransform;
@@ -60,6 +59,14 @@ namespace MizukiTool.AStar
                 return false;
             }
         }
+        /// <summary>
+        /// 初始化地图
+        /// </summary>
+        /// <param name="width">地图宽度</param>
+        /// <param name="height">地图高度</param>
+        /// <param name="cellSize">单个方块大小</param>
+        /// <param name="origin">左下角边缘位置</param>
+        /// <param name="mapData">地图数据</param>
         public void InitMap(int width, int height, float cellSize, Vector3 origin, PointMod[,] mapData)
         {
             map = new AstarMap(width, height, cellSize, origin, mapData);
@@ -68,7 +75,7 @@ namespace MizukiTool.AStar
         /// <summary>
         /// 更新地图信息
         /// </summary>
-        public AstarMap UpdateMap()
+        public virtual AstarMap UpdateMap()
         {
             float cellSize = map.GetCellSize();
             Vector3 origin = map.GetOrigin() + new Vector3(cellSize / 2, cellSize / 2, 0);
@@ -111,8 +118,14 @@ namespace MizukiTool.AStar
         public float PathFindingDistance = 20;
         public float PathFindingInterval = 0.5f;
         public bool UseSimplePath = false;
-        //在一定距离外采用直线寻路
-        //在一定距离内采用A*寻路
+        /// <summary>
+        /// 在一定距离外采用直线寻路
+        /// 在一定距离内采用A*寻路
+        /// </summary>
+        /// <param name="startPos">初始位置</param>
+        /// <param name="endPos">目标位置</param>
+        /// <param name="path">输出路径</param>
+        /// <returns></returns>
         public bool TryFindPath(Vector3 startPos, Vector3 endPos, out List<Point> path)
         {
             EnsureInstance();
@@ -135,7 +148,12 @@ namespace MizukiTool.AStar
             return b;
         }
 
-        //下一个方向
+        /// <summary>
+        /// 尝试获取路径上的下一个方向
+        /// </summary>
+        /// <param name="currentPos">当前位置</param>
+        /// <param name="path">路径</param>
+        /// <returns></returns>
         public Vector3 NextDirection(Vector3 currentPos, List<Point> path)
         {
             EnsureInstance();
@@ -148,8 +166,13 @@ namespace MizukiTool.AStar
             return (nextPoint - currentPos).normalized;
         }
 
-        //简化路径
-        public List<Point> SimplizePath(List<Point> path, Vector3 selfPos, Vector3 targetPos)
+        /// <summary>
+        /// 简化路径
+        /// </summary>
+        /// <param name="path">需要简化的路径</param>
+        /// <param name="selfPos">自身位置</param>
+        /// <returns></returns>
+        public List<Point> SimplizePath(List<Point> path, Vector3 selfPos)
         {
             EnsureInstance();
             if (path.Count < 3)
@@ -188,7 +211,14 @@ namespace MizukiTool.AStar
             }
             return path;
         }
-        //将List<Point>型路径转换为List<Vector3>型
+
+        /// <summary>
+        /// 将List<Point>型路径转换为List<Vector3>型
+        /// </summary>
+        /// <param name="path">需要转换的路径</param>
+        /// <param name="selfPos">自身位置</param>
+        /// <param name="targetPos">目标位置</param>
+        /// <returns></returns>
         public List<Vector3> ConvertPathToVector3(List<Point> path, Vector3 selfPos, Vector3 targetPos)
         {
             List<Vector3> newPath = new List<Vector3>();
@@ -200,7 +230,11 @@ namespace MizukiTool.AStar
             newPath.Add(targetPos);
             return newPath;
         }
-        //将List<Vector3>型路径转换为List<Point>型
+        /// <summary>
+        /// 将List<Vector3>型路径转换为List<Point>型
+        /// </summary>
+        /// <param name="path">需要转换的路径</param>
+        /// <returns></returns>
         public List<Point> ConvertPathToPoint(List<Vector3> path)
         {
             List<Point> newPath = new List<Point>();
@@ -215,23 +249,32 @@ namespace MizukiTool.AStar
         [Header("向量场寻路相关")]
         public int VectorPathRange = 20;
         public float RefreshInterval = 1f;
-        public void CreatAstarVector(Vector3 startPos)
+        /// <summary>
+        /// 创建向量场
+        /// </summary>
+        /// <param name="targetPos">目标位置</param>
+        public void CreatAstarVector(Vector3 targetPos)
         {
             EnsureInstance();
             if (map == null)
             {
                 TryLoadMap(out map);
             }
-            map = AStarWrapper.CreatAstarVector(map, startPos, VectorPathRange);
+            map = AStarWrapper.CreatAstarVector(map, targetPos, VectorPathRange);
         }
-        public Vector3 GetNextDirection(Vector3 startPos)
+        /// <summary>
+        /// 从向量场中获取下一个方向
+        /// </summary>
+        /// <param name="currentPos">当前位置</param>
+        /// <returns></returns>
+        public Vector3 GetNextDirectionFromAstarVector(Vector3 currentPos)
         {
             EnsureInstance();
             if (map == null)
             {
                 TryLoadMap(out map);
             }
-            Point point = map.GetPointOnMap(startPos);
+            Point point = map.GetPointOnMap(currentPos);
             //Debug.Log("NextDirection: " + map[point.X, point.Y].Direction);
             return map[point.X, point.Y].Direction;
         }
@@ -243,19 +286,33 @@ namespace MizukiTool.AStar
         /// <param name="astarMap">用到的地图</param>
         /// <param name="startPos">起始点</param>
         /// <param name="pointMods">可通行的节点Mod</param>
-        /// <param name="func">改变Point状态的函数</param>
+        /// <param name="pointHander">改变Point状态的函数</param>
         /// <returns></returns>
-        public AstarMap UpdateAllAstarPonitInCloseList(AstarMap astarMap, Vector3 startPos, PointMod[] pointMods, PointParameter func)
-            => AStarWrapper.UpdateAllAstarPonitInCloseList(astarMap, startPos, pointMods, func);
+        public AstarMap UpdateAllAstarPonitInCloseList(AstarMap astarMap, Vector3 startPos, PointMod[] pointMods, Action<Point> pointHander)
+            => AStarWrapper.UpdateAllAstarPonitInCloseList(astarMap, startPos, pointMods, pointHander);
+
+        /// <summary>
+        /// 获取相邻的节点
+        /// </summary>
+        /// <param name="position">当前位置</param>
+        /// <returns></returns>
         public List<Point> GetNeighbourPoints(Vector3 position)
         {
             Point point = map.GetPointOnMap(position);
             return AStarWrapper.GetNeighbourPoints(map, point);
         }
-
+        /// <summary>
+        /// 获取相邻的节点
+        /// </summary>
+        /// <param name="point">当前所在的节点</param>
+        /// <returns></returns>
         public List<Point> GetNeighbourPoints(Point point)
             => AStarWrapper.GetNeighbourPoints(map, point);
-
+        /// <summary>
+        /// 获取当前位置所在的节点
+        /// </summary>
+        /// <param name="position">当前位置</param>
+        /// <returns></returns>
         public Point GetPointOnMap(Vector3 position)
             => map.GetPointOnMap(position);
         #endregion
@@ -265,7 +322,7 @@ namespace MizukiTool.AStar
         [Header("显示路径标注")]
         public bool ShowPathLableGizmos = true;
 
-        public Transform t;
+        public Transform ShowPathTarget;
         public List<Point> path;
 
         void OnDrawGizmos()
@@ -276,7 +333,7 @@ namespace MizukiTool.AStar
             }
             if (path != null && ShowPathLableGizmos)
             {
-                DrawPath(path, t);
+                DrawPath(path, ShowPathTarget);
             }
         }
 
@@ -323,13 +380,6 @@ namespace MizukiTool.AStar
                 Vector3 endPos = map.GetPositionOnMap(path[i + 1]);
                 Gizmos.DrawLine(startPos, endPos);
             }
-        }
-        #endregion
-
-        #region Test        
-        void Test()
-        {
-
         }
         #endregion
     }

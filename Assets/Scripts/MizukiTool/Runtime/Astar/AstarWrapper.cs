@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace MizukiTool.AStar
     /// <summary>
     /// A*算法的封装
     /// </summary> 
-    public static class AStarWrapper
+    internal static class AStarWrapper
     {
         public static List<Point> path = new List<Point>();
         private static List<Point> openList = new List<Point>();
@@ -205,15 +206,14 @@ namespace MizukiTool.AStar
             }
         }
         #region NewMethod 
-        public delegate void PointParameter(Point pointParameter);
         /// <summary>
         /// 更新CloseList中所有的AstarPoint的Mod
         /// </summary>
         /// <param name="astarMap">用到的地图</param>
         /// <param name="startPos">起始点</param>
-        /// <param name="func">改变Point状态的函数</param>
+        /// <param name="pointHander">改变Point状态的函数</param>
         /// <returns></returns>
-        public static AstarMap UpdateAllAstarPonitInCloseList(AstarMap astarMap, Vector3 startPos, PointMod[] pointMods, PointParameter func)
+        public static AstarMap UpdateAllAstarPonitInCloseList(AstarMap astarMap, Vector3 startPos, PointMod[] pointMods, Action<Point> pointHander)
         {
             Point start = astarMap.GetPointOnMap(startPos);
             openList.Clear();

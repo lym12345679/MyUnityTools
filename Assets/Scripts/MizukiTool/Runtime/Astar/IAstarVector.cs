@@ -8,7 +8,7 @@ namespace MizukiTool.AStar
         public float AutoMoveSpeed { get; set; }
         public Transform SelfTransform { get; set; }
         public Vector3 CurrentDirection { get; set; }
-        public Vector3 GetNextDirection() => AstarManager.Instance.GetNextDirection(SelfTransform.position);
+        public Vector3 GetNextDirection() => AstarManager.Instance.GetNextDirectionFromAstarVector(SelfTransform.position);
 
 
         public void AutoMove()
