@@ -16,6 +16,10 @@ namespace MizukiTool.RecyclePool
 
         [HideInInspector]
         public string id;
+        void OnEnable()
+        {
+
+        }
         private void FixedUpdate()
         {
             if (AutoRecycleTime < 0)
@@ -27,7 +31,8 @@ namespace MizukiTool.RecyclePool
             {
                 //todo:回收该物体
                 //Debug.Log("RecycleObject");
-                RecyclePool.CollectRecycleObject(this.gameObject, this);
+                RecyclePoolUtil.CollectRecycleObject(this.gameObject, this);
+                recycleTick = 0;
             }
         }
     }
