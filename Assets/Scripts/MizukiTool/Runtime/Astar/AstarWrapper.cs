@@ -8,7 +8,6 @@ namespace MizukiTool.AStar
     /// </summary> 
     public static class AStarWrapper
     {
-
         public static List<Point> path = new List<Point>();
         private static List<Point> openList = new List<Point>();
         private static List<Point> closeList = new List<Point>();
@@ -59,6 +58,7 @@ namespace MizukiTool.AStar
             openList.Add(start);
             int i = 0;
             Point flag = start;
+            //找到所有能够到达的点
             while (openList.Count > 0 && i < range)
             {
                 //找到openList第一个点
@@ -77,6 +77,7 @@ namespace MizukiTool.AStar
                 //过滤closeList中的节点,并且更新openList中的节点
                 UpdateCloseListAndOpenList(surroundPoint, closeList, openList, point);
             }
+            //遍历所有能够到达的点，设置方向
             foreach (var point in closeList)
             {
                 if (point.Parent == null)
@@ -114,7 +115,7 @@ namespace MizukiTool.AStar
             if (map[x, y + 1] != null)
             {
                 right = map[x, y + 1];
-                if (right.Walkable == 0)
+                if (right.Mod == 0)
                 {
                     surroundPoints.Add(right);
                 }
@@ -122,7 +123,7 @@ namespace MizukiTool.AStar
             if (map[x, y - 1] != null)
             {
                 left = map[x, y - 1];
-                if (left.Walkable == 0)
+                if (left.Mod == 0)
                 {
                     surroundPoints.Add(left);
                 }
@@ -130,7 +131,7 @@ namespace MizukiTool.AStar
             if (map[x + 1, y] != null)
             {
                 up = map[x + 1, y];
-                if (up.Walkable == 0)
+                if (up.Mod == 0)
                 {
                     surroundPoints.Add(up);
                 }
@@ -138,7 +139,7 @@ namespace MizukiTool.AStar
             if (map[x - 1, y] != null)
             {
                 down = map[x - 1, y];
-                if (down.Walkable == 0)
+                if (down.Mod == 0)
                 {
                     surroundPoints.Add(down);
                 }
@@ -146,7 +147,7 @@ namespace MizukiTool.AStar
             if (map[x + 1, y + 1] != null && right != null && up != null)
             {
                 upRight = map[x + 1, y + 1];
-                if (upRight.Walkable == 0 && (right.Walkable == 0 || up.Walkable == 0))
+                if (upRight.Mod == 0 && (right.Mod == 0 || up.Mod == 0))
                 {
                     surroundPoints.Add(upRight);
                 }
@@ -154,7 +155,7 @@ namespace MizukiTool.AStar
             if (map[x + 1, y - 1] != null && left != null && up != null)
             {
                 upLeft = map[x + 1, y - 1];
-                if (upLeft.Walkable == 0 && (left.Walkable == 0 || up.Walkable == 0))
+                if (upLeft.Mod == 0 && (left.Mod == 0 || up.Mod == 0))
                 {
                     surroundPoints.Add(upLeft);
                 }
@@ -162,7 +163,7 @@ namespace MizukiTool.AStar
             if (map[x - 1, y + 1] != null && right != null && down != null)
             {
                 downRight = map[x - 1, y + 1];
-                if (downRight.Walkable == 0 && (right.Walkable == 0 || down.Walkable == 0))
+                if (downRight.Mod == 0 && (right.Mod == 0 || down.Mod == 0))
                 {
                     surroundPoints.Add(downRight);
                 }
@@ -170,7 +171,7 @@ namespace MizukiTool.AStar
             if (map[x - 1, y - 1] != null && left != null && down != null)
             {
                 downLeft = map[x - 1, y - 1];
-                if (downLeft.Walkable == 0 && (left.Walkable == 0 || down.Walkable == 0))
+                if (downLeft.Mod == 0 && (left.Mod == 0 || down.Mod == 0))
                 {
                     surroundPoints.Add(downLeft);
                 }
@@ -203,6 +204,128 @@ namespace MizukiTool.AStar
                 }
             }
         }
+        #region NewMethod 
+        public delegate void PointParameter(Point pointParameter);
+        /// <summary>
+        /// 更新CloseList中所有的AstarPoint的Mod
+        /// </summary>
+        /// <param name="astarMap">用到的地图</param>
+        /// <param name="startPos">起始点</param>
+        /// <param name="func">改变Point状态的函数</param>
+        /// <returns></returns>
+        public static AstarMap UpdateAllAstarPonitInCloseList(AstarMap astarMap, Vector3 startPos, PointMod[] pointMods, PointParameter func)
+        {
+            Point start = astarMap.GetPointOnMap(startPos);
+            openList.Clear();
+            closeList.Clear();
+            openList.Add(start);
+            int i = 0;
+            Point flag = start;
+            //找到所有能够到达的点
+            while (openList.Count > 0)
+            {
+                //找到openList第一个点
+                Point point = openList[0];
+                if (flag == point)
+                {
+                    flag = openList[openList.Count - 1];
+                    i++;
+                }
+                //把该节点从openList中移除，之后移入closeList中
+                openList.Remove(point);
+                closeList.Add(point);
 
+                //找到该节点的相邻节点
+                List<Point> surroundPoint = FindSurroundPointWithTheSamePointMod(astarMap, point, pointMods);
+                //过滤closeList中的节点,并且更新openList中的节点
+                UpdateCloseListAndOpenList(surroundPoint, closeList, openList, point);
+            }
+            return astarMap;
+        }
+
+        private static List<Point> FindSurroundPointWithTheSamePointMod(AstarMap map, Point point, PointMod[] pointMods)
+        {
+            List<Point> surroundPoints = new List<Point>();
+            Point up = null, down = null, left = null, right = null;
+            int x = point.X;
+            int y = point.Y;
+            if (map[x, y + 1] != null)
+            {
+                right = map[x, y + 1];
+                foreach (var pointMod in pointMods)
+                {
+                    if (right.Mod == pointMod)
+                    {
+
+                        surroundPoints.Add(right);
+                    }
+                }
+            }
+            if (map[x, y - 1] != null)
+            {
+                left = map[x, y - 1];
+                foreach (var pointMod in pointMods)
+                {
+                    if (left.Mod == pointMod)
+                    {
+                        surroundPoints.Add(left);
+                    }
+                }
+            }
+            if (map[x + 1, y] != null)
+            {
+                up = map[x + 1, y];
+                foreach (var pointMod in pointMods)
+                {
+                    if (up.Mod == pointMod)
+                    {
+                        surroundPoints.Add(up);
+                    }
+                }
+            }
+            if (map[x - 1, y] != null)
+            {
+                down = map[x - 1, y];
+                foreach (var pointMod in pointMods)
+                {
+                    if (down.Mod == pointMod)
+                    {
+                        surroundPoints.Add(down);
+                    }
+                }
+            }
+            return surroundPoints;
+        }
+
+        public static List<Point> GetNeighbourPoints(AstarMap map, Point point)
+        {
+            List<Point> neighbourPoints = new List<Point>();
+            Point up = null, down = null, left = null, right = null;
+            int x = point.X;
+            int y = point.Y;
+            if (map[x, y + 1] != null)
+            {
+                right = map[x, y + 1];
+                neighbourPoints.Add(right);
+            }
+            if (map[x, y - 1] != null)
+            {
+                left = map[x, y - 1];
+                neighbourPoints.Add(left);
+            }
+            if (map[x + 1, y] != null)
+            {
+                up = map[x + 1, y];
+                neighbourPoints.Add(up);
+            }
+            if (map[x - 1, y] != null)
+            {
+                down = map[x - 1, y];
+                neighbourPoints.Add(down);
+            }
+            return neighbourPoints;
+        }
+        #endregion
     }
+
 }

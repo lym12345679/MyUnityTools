@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 namespace MizukiTool.AStar
 {
@@ -25,7 +26,7 @@ namespace MizukiTool.AStar
         /// <summary>
         /// 是否可行走
         /// </summary>
-        public int Walkable;
+        public PointMod Mod;
         /// <summary>
         /// 节点价值
         /// </summary>
@@ -38,12 +39,47 @@ namespace MizukiTool.AStar
         /// 向量方向
         /// </summary>
         public Vector3 Direction;
-        public Point(int x, int y, int walkable, Point parent = null, int value = 1)
+        /// <summary>
+        /// 游戏对象
+        /// </summary>
+        private GameObject gameObject;
+        public Component MainCompoment;
+        public T GetMainCompoment<T>() where T : Component
+        {
+            if (MainCompoment == null)
+            {
+                //Debug.Log("(" + X + "," + Y + "):MainCompoment is null");
+                return null;
+            }
+            return MainCompoment as T;
+        }
+        public GameObject GameObject
+        {
+            get { return gameObject; }
+            set
+            {
+                if (gameObject == null)
+                {
+                    gameObject = value;
+                    return;
+                }
+                if ((int)gameObject.transform.position.x != (int)value.transform.position.x)
+                {
+                    Debug.Log("SetGameObject:" + value.transform.position);
+                }
+                else if ((int)gameObject.transform.position.y != (int)value.transform.position.y)
+                {
+                    Debug.Log("SetGameObject:" + value.transform.position);
+                }
+                gameObject = value;
+            }
+        }
+        public Point(int x, int y, PointMod walkable, Point parent = null, int value = 1)
         {
             this.Parent = null;
             this.X = x;
             this.Y = y;
-            this.Walkable = walkable;
+            this.Mod = walkable;
             this.Value = 1;
             Direction = new Vector3(0, 0, 0);
         }
@@ -70,16 +106,16 @@ namespace MizukiTool.AStar
         private int mapHeight, mapWidth;
         float cellSize;
         Vector3 origin = new Vector3(0, 0, 0);
-        int[,] mapData;
+        PointMod[,] mapData;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="mapHeight">地图高度</param>
         /// <param name="mapWidth">地图宽度</param>
         /// <param name="cellSize">一个正方形节点的大小</param>
-        public AstarMap(int mapHeight, int mapWidth, float cellSize = 1)
+        public AstarMap(int mapWidth, int mapHeight, float cellSize = 1)
         {
-            astarMap = new Point[mapHeight, mapWidth];
+            astarMap = new Point[mapWidth, mapHeight];
             this.mapHeight = mapHeight;
             this.mapWidth = mapWidth;
             this.cellSize = cellSize;
@@ -94,9 +130,9 @@ namespace MizukiTool.AStar
         /// <param name="cellSize">一个正方形节点的大小</param>
         /// <param name="origin">初始坐标</param>
         /// <param name="mapData"></param> 
-        public AstarMap(int mapHeight, int mapWidth, float cellSize, Vector3 origin, int[,] mapData = null)
+        public AstarMap(int mapWidth, int mapHeight, float cellSize, Vector3 origin, PointMod[,] mapData = null)
         {
-            astarMap = new Point[mapHeight, mapWidth];
+            astarMap = new Point[mapWidth, mapHeight];
             this.mapHeight = mapHeight;
             this.mapWidth = mapWidth;
             this.cellSize = cellSize;
@@ -106,27 +142,27 @@ namespace MizukiTool.AStar
 
         public void InitMap()
         {
-            for (int i = 0; i < mapHeight; i++)
+            for (int i = 0; i < mapWidth; i++)
             {
-                for (int j = 0; j < mapWidth; j++)
+                for (int j = 0; j < mapHeight; j++)
                 {
                     astarMap[i, j] = new Point(i, j, 0);
                 }
             }
         }
 
-        public void InitMap(int[,] mapData)
+        public void InitMap(PointMod[,] mapData)
         {
-            for (int i = 0; i < mapHeight; i++)
+            for (int i = 0; i < mapWidth; i++)
             {
-                for (int j = 0; j < mapWidth; j++)
+                for (int j = 0; j < mapHeight; j++)
                 {
                     astarMap[i, j] = new Point(i, j, mapData[i, j]);
                 }
             }
         }
 
-        public void InitMap(int width, int height, float cellSize, Vector3 origin, int[,] mapData)
+        public void InitMap(int width, int height, float cellSize, Vector3 origin, PointMod[,] mapData)
         {
             astarMap = new Point[width, height];
             this.mapHeight = width;
@@ -148,7 +184,7 @@ namespace MizukiTool.AStar
         /// </summary>
         public void UpdatePoint(Point node)
         {
-            if (node.X >= mapHeight || node.X < 0 || node.Y >= mapWidth || node.Y < 0)
+            if (node.Y >= mapHeight || node.Y < 0 || node.X >= mapWidth || node.X < 0)
             {
                 return;
             }
@@ -161,7 +197,7 @@ namespace MizukiTool.AStar
         {
             get
             {
-                if (x >= mapHeight || x < 0 || y >= mapWidth || y < 0)
+                if (y >= mapHeight || y < 0 || x >= mapWidth || x < 0)
                 {
                     return null;
                 }
@@ -181,10 +217,11 @@ namespace MizukiTool.AStar
         {
             int x = (int)((position.x - origin.x) / cellSize);
             int y = (int)((position.y - origin.y) / cellSize);
-            if (x >= mapHeight || x < 0 || y >= mapWidth || y < 0)
+            if (y >= mapHeight || y < 0 || x >= mapWidth || x < 0)
             {
                 return null;
             }
+            //Debug.Log("GetPointOnMap:(" + x + "," + y + ")");
             return astarMap[x, y];
         }
         /// <summary>
@@ -196,24 +233,61 @@ namespace MizukiTool.AStar
         {
             return new Vector3(point.X * cellSize + origin.x, point.Y * cellSize + origin.y, 0);
         }
-        public void SetMapData(int[,] mapData)
+        public void SetMapData(PointMod[,] mapData)
         {
             this.mapData = mapData;
-            for (int i = 0; i < mapHeight; i++)
+            Debug.Log("SetMapData:(" + this.mapWidth + "," + this.mapHeight + " )(" + mapData.Length + ")");
+            for (int i = 0; i < this.mapWidth; i++)
             {
-                for (int j = 0; j < mapWidth; j++)
+                for (int j = 0; j < this.mapHeight; j++)
                 {
+                    //Debug.Log("SetMapData: (" + i + "," + j + ")" + mapData[i, j]);
                     astarMap[i, j] = new Point(i, j, mapData[i, j]);
                 }
             }
         }
         public void ResetMapData()
         {
-            for (int i = 0; i < mapHeight; i++)
+            for (int i = 0; i < mapWidth; i++)
             {
-                for (int j = 0; j < mapWidth; j++)
+                for (int j = 0; j < mapHeight; j++)
                 {
                     astarMap[i, j] = new Point(i, j, mapData[i, j]);
+                }
+            }
+        }
+        public void SetGameObjects(GameObject[,] gameObjects)
+        {
+            //Debug.Log("SetGameObjects:(" + mapWidth + "," + mapHeight + " )(" + gameObjects.Length + ")");
+            for (int i = 0; i < mapWidth; i++)
+            {
+                for (int j = 0; j < mapHeight; j++)
+                {
+                    /*if (gameObjects[i, j] != null)
+                    {
+                        Debug.Log("SetGameObjects: (" + j + "," + i + ")" + gameObjects[i, j].transform.position);
+                    }*/
+                    astarMap[i, j].GameObject = gameObjects[i, j];
+                }
+            }
+        }
+        public void SetMainCompoment(Component[,] mainCompoments)
+        {
+            for (int i = 0; i < mapWidth; i++)
+            {
+                for (int j = 0; j < mapHeight; j++)
+                {
+                    astarMap[i, j].MainCompoment = mainCompoments[i, j];
+                }
+            }
+        }
+        public void ResetGameObjects()
+        {
+            for (int i = 0; i < mapWidth; i++)
+            {
+                for (int j = 0; j < mapHeight; j++)
+                {
+                    astarMap[i, j].GameObject = null;
                 }
             }
         }
@@ -234,7 +308,7 @@ namespace MizukiTool.AStar
             return origin;
         }
 
-        
+
     }
 
 
