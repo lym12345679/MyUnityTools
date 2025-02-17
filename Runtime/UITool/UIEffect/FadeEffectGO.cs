@@ -1,13 +1,11 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace MizukiTool.UIEffect
 {
-    public delegate float PercentageHandler(float percentage);
-    public class FadeEffect<T> where T : Graphic
+    public class FadeEffectGO<T> where T : Renderer
     {
-
+        public delegate float PercentageHandler(float percentage);
         public void UpdateFade()
         {
             if (isPause)
@@ -24,14 +22,14 @@ namespace MizukiTool.UIEffect
                     break;
             }
         }
-        public FadeEffect()
+        public FadeEffectGO(T target)
         {
             fadeTime = 0;
             fadeDelay = 0;
             finalFadeColor = Color.white;
             timeTrick = 0;
             fadeMode = FadeMode.Once;
-            FadeTarget = null;
+            FadeTarget = target;
             isFadeFinish = false;
             loopCount = 0;
         }
@@ -48,10 +46,11 @@ namespace MizukiTool.UIEffect
         private Color finalFadeColor;
         //循环次数
         private int loopCount;
+        private PercentageHandler percentageHander;
         /// <summary>
         /// 设置渐变时间
         /// </summary>
-        public FadeEffect<T> SetFadeTime(float fadeTime)
+        public FadeEffectGO<T> SetFadeTime(float fadeTime)
         {
             this.fadeTime = fadeTime;
             return this;
@@ -60,7 +59,7 @@ namespace MizukiTool.UIEffect
         /// <summary>
         /// 设置渐变延迟
         /// </summary>
-        public FadeEffect<T> SetFadeDelay(float fadeDelay)
+        public FadeEffectGO<T> SetFadeDelay(float fadeDelay)
         {
             this.fadeDelay = fadeDelay;
             return this;
@@ -71,7 +70,7 @@ namespace MizukiTool.UIEffect
         /// </summary>
         /// <param name="color"></param>
         /// <returns></returns>
-        public FadeEffect<T> SetFadeColor(Color color)
+        public FadeEffectGO<T> SetFadeColor(Color color)
         {
             this.finalFadeColor = color;
             return this;
@@ -81,7 +80,7 @@ namespace MizukiTool.UIEffect
         /// </summary>
         /// <param name="fadeMode"></param>
         /// <returns></returns>
-        public FadeEffect<T> SetFadeMode(FadeMode fadeMode)
+        public FadeEffectGO<T> SetFadeMode(FadeMode fadeMode)
         {
             this.fadeMode = fadeMode;
             return this;
@@ -91,9 +90,18 @@ namespace MizukiTool.UIEffect
         /// </summary>
         /// <param name="endHander"></param>
         /// <returns></returns>
-        public FadeEffect<T> SetEndHander(Action<FadeEffect<T>> endHander)
+        public FadeEffectGO<T> SetEndHander(Action<FadeEffectGO<T>> endHander)
         {
             this.endHander = endHander;
+            return this;
+        }
+        /// <summary>
+        /// 设置缩放百分比处理器
+        /// </summary>
+        /// <param name="PercentageHandler">输入为当前线性缩放百分比,输出为修改后的百分比</param>
+        public FadeEffectGO<T> SetPersentageHander(PercentageHandler hander)
+        {
+            this.percentageHander = hander;
             return this;
         }
         #endregion
@@ -104,17 +112,16 @@ namespace MizukiTool.UIEffect
         public Color OriginalColor;
         private bool isFadeFinish;
         private bool isPause;
-        private Action<FadeEffect<T>> endHander;
+        private Action<FadeEffectGO<T>> endHander;
         private bool isFinishImmediately;
-        private PercentageHandler percentageHander;
-        public FadeEffect<T> Start(T target)
+        public FadeEffectGO<T> Start(T target)
         {
-            FadeEffect<T> copy = Copy(this);
+            FadeEffectGO<T> copy = Copy(this);
             copy.FadeTarget = target;
             copy.endHander = endHander;
-            if (target is Image image)
+            if (target is SpriteRenderer spriteRenderer)
             {
-                copy.OriginalColor = image.color;
+                copy.OriginalColor = spriteRenderer.color;
             }
             else if (target is Renderer renderer)
             {
@@ -170,46 +177,38 @@ namespace MizukiTool.UIEffect
             }
             UpdateColor(t);
         }
+
         public void UpdateColor(float t)
         {
-            //Debug.Log(t);
             if (percentageHander != null)
             {
                 t = percentageHander(t);
             }
-            if (FadeTarget)
-            {
-                if (FadeTarget is Image image)
-                {
-                    image.color = Color.Lerp(OriginalColor, finalFadeColor, t);
-                    //Debug.Log(image.color);
-                }
-            }
             else
             {
-                Debug.LogError("FadeTarget is null");
+                //Debug.Log("percentageHander is null");
             }
-        }
-        /// <summary>
-        /// 设置缩放百分比处理器
-        /// </summary>
-        /// <param name="PercentageHandler">输入为当前线性缩放百分比,输出为修改后的百分比</param>
-        public FadeEffect<T> SetPersentageHander(PercentageHandler hander)
-        {
-            this.percentageHander = hander;
-            return this;
+            if (FadeTarget is SpriteRenderer spriteRenderer)
+            {
+                spriteRenderer.color = Color.Lerp(OriginalColor, finalFadeColor, t);
+            }
+            else if (FadeTarget is Renderer renderer)
+            {
+                renderer.material.color = Color.Lerp(OriginalColor, finalFadeColor, t);
+                //Debug.Log(renderer.material.color);
+            }
         }
         #endregion
         #region 其他
-        public FadeEffect<T> Copy(FadeEffect<T> fade)
+        public FadeEffectGO<T> Copy(FadeEffectGO<T> fade)
         {
-            return new FadeEffect<T>()
+            return new FadeEffectGO<T>(this.FadeTarget)
             .SetFadeTime(fade.fadeTime)
             .SetFadeDelay(fade.fadeDelay)
             .SetFadeColor(fade.finalFadeColor)
             .SetFadeMode(fade.fadeMode)
-            .SetEndHander(fade.endHander);
-
+            .SetEndHander(fade.endHander)
+            .SetPersentageHander(fade.percentageHander);
         }
         public bool IsFadeFinish()
         {
@@ -258,6 +257,7 @@ namespace MizukiTool.UIEffect
         {
             isFinishImmediately = true;
         }
+        /// <sum
         /// <summary>
         /// 暂时停止,使用Continue继续执行
         /// </summary>
@@ -273,13 +273,6 @@ namespace MizukiTool.UIEffect
             isPause = true;
         }
         /// <summary>
-        /// 改变最终颜色
-        /// </summary>
-        public void ChangeFinalColor(Color color)
-        {
-            finalFadeColor = color;
-        }
-        /// <summary>
         /// 立刻执行一次结束处理
         /// /// </summary>
         public void StartEndHander()
@@ -287,19 +280,24 @@ namespace MizukiTool.UIEffect
             endHander?.Invoke(this);
         }
         /// <summary>
+        /// 改变最终颜色
+        /// </summary>
+        public void ChangeFinalColor(Color color)
+        {
+            finalFadeColor = color;
+        }
+        /// <summary>
         /// 改变初始颜色(会忘掉最初的颜色)
         /// </summary>
-        public void ChangeOriginalColor(Color color)
+        public FadeEffectGO<T> SetOriginalColor(Color color)
         {
             OriginalColor = color;
+            return this;
+        }
+        public T GetFadeTarget()
+        {
+            return FadeTarget;
         }
         #endregion
-    }
-
-
-    public enum FadeMode
-    {
-        Once,
-        Loop,
     }
 }
