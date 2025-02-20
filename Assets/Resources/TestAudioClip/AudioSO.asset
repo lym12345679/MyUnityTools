@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2662ef15a9bce294dbebb3c1e269dc20, type: 3}
   m_Name: AudioSO
   m_EditorClassIdentifier: 
-  audioList: []
+  audioList:
+  - Name: BGM_Arknight_Babel1
+    audioEnum: 0
+    audioClip: {fileID: 8300000, guid: c14914c4f10490344b889f537a7b9107, type: 3}
+  - Name: BGM_Arknight_Babel2
+    audioEnum: 1
+    audioClip: {fileID: 8300000, guid: 3144aec3c54f6874c82cbd0b3f4cf1b2, type: 3}
