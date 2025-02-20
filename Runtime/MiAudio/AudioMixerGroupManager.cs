@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace MizukiTool.Audio
+namespace MizukiTool.MiAudio
 {
     //用于管理每组AudioMixer的音量大小
     public class AudioMixerGroupManager

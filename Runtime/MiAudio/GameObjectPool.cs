@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MizukiTool.Audio
+namespace MizukiTool.MiAudio
 {
     public class GameObjectPool
     {

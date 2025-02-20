@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace MizukiTool.Audio
+namespace MizukiTool.MiAudio
 {
     public static class AudioUtil
     {

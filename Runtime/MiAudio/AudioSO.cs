@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MizukiTool.Audio
+namespace MizukiTool.MiAudio
 {
     [CreateAssetMenu(fileName = "AudioSO", menuName = "MizukiTool/AudioSO")]
     public class MizukiTestAudioSO : GeneralAudioSO<MizukiTestAudioEnum>
