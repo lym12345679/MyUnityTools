@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21c5b4c4d484d0f43b6c3f5d047f7773, type: 3}
+  m_Name: AudioMixerSO
+  m_EditorClassIdentifier: 
+  audioMixerList:
+  - Name: BGM
+    audioMixerEnum: 1
+    audioMixerGroup: {fileID: 5151536163261678625, guid: 11db746d08004354b92a630b261cf035, type: 2}
+  - Name: Effect
+    audioMixerEnum: 2
+    audioMixerGroup: {fileID: 7340463963968934232, guid: 11db746d08004354b92a630b261cf035, type: 2}
