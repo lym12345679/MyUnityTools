@@ -1,5 +1,5 @@
 using System;
-namespace MizukiTool.Audio
+namespace MizukiTool.MiAudio
 {
     internal class EnumIdentifier
     {

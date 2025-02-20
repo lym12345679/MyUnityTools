@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
-namespace MizukiTool.Audio
+namespace MizukiTool.MiAudio
 {
     [CreateAssetMenu(fileName = "AudioMixerSO", menuName = "MizukiTool/AudioMixerSO")]
     public class AudioMixerGroupSO : ScriptableObject

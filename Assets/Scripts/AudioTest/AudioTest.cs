@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MizukiTool.Audio;
+using MizukiTool.MiAudio;
 public class AudioTest : MonoBehaviour
 {
     // Start is called before the first frame update

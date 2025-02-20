@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace MizukiTool.Audio
+namespace MizukiTool.MiAudio
 {
     public class AudioPlayContext
     {
