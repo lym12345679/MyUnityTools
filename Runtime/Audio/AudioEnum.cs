@@ -1,7 +1,7 @@
 
 namespace MizukiTool.Audio
 {
-    public enum AudioEnum
+    public enum MizukiTestAudioEnum
     {
         BGM_Arknight_Babel1,
         BGM_Arknight_Babel2,

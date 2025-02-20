@@ -10,10 +10,9 @@ namespace MizukiTool.Audio
         /// 音响
         /// </summary>
         public static AudioMixerGroupSO audioMixerGroupSO = Resources.Load<AudioMixerGroupSO>("TestAudioClip/AudioMixerSO");
-        /// <summary>
-        /// 音效存储参考
-        /// </summary>
-        public static AudioSO audioSO = Resources.Load<AudioSO>("TestAudioClip/AudioSO");
+
+        /// 音效存储参考方式
+        public static MizukiTestAudioSO audioSO = Resources.Load<MizukiTestAudioSO>("TestAudioClip/AudioSO");
         /// <summary>
         /// 注册所有的音效(配合RegisterAudioClip使用),在第一次调用音效时立刻触发
         /// </summary>
@@ -35,7 +34,7 @@ namespace MizukiTool.Audio
         /// <param name="endEventHander">播放结束时触发的事件</param>
         /// <param name="fixedUpdateEventHander">更新时触发的事件</param>
         /// <returns></returns>
-        public static long Play(AudioEnum audioEnum, AudioMixerGroupEnum audioMixerGroupEnum, AudioPlayMod audioPlayMod, Action<AudioPlayContext> endEventHander = null, Action<AudioPlayContext> fixedUpdateEventHander = null)
+        public static long Play(MizukiTestAudioEnum audioEnum, AudioMixerGroupEnum audioMixerGroupEnum, AudioPlayMod audioPlayMod, Action<AudioPlayContext> endEventHander = null, Action<AudioPlayContext> fixedUpdateEventHander = null)
         {
             EnsureInstance();
             return AudioManager.Instance.Play(audioEnum, audioMixerGroupEnum, audioPlayMod, endEventHander, fixedUpdateEventHander);
@@ -76,7 +75,7 @@ namespace MizukiTool.Audio
         /// </summary>
         /// <param name="audioEnum">该音效所对应的枚举</param>
         /// <returns></returns>
-        public static bool CheckEnumInLoopAudio(AudioEnum audioEnum)
+        public static bool CheckEnumInLoopAudio(MizukiTestAudioEnum audioEnum)
         {
             EnsureInstance();
             return AudioManager.Instance.CheckEnumInLoopAudio(audioEnum);
