@@ -291,7 +291,7 @@ namespace MizukiTool.Audio
         /// </summary>
         /// <param name="audioEnum"></param>
         /// <returns></returns>
-        public bool CheckEnumInLoopAudio(AudioEnum audioEnum)
+        public bool CheckEnumInLoopAudio(MizukiTestAudioEnum audioEnum)
         {
             mEnumIdentifier.SetEnum(audioEnum);
             string audioEnumID = mEnumIdentifier.GetID();

@@ -7,9 +7,9 @@ public class AudioTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        AudioUtil.Play(AudioEnum.BGM_Arknight_Babel1, AudioMixerGroupEnum.BGM, AudioPlayMod.FadeInThenNormal, (context) =>
+        AudioUtil.Play(MizukiTestAudioEnum.BGM_Arknight_Babel1, AudioMixerGroupEnum.BGM, AudioPlayMod.FadeInThenNormal, (context) =>
         {
-            AudioUtil.Play(AudioEnum.BGM_Arknight_Babel2, AudioMixerGroupEnum.BGM, AudioPlayMod.Loop);
+            AudioUtil.Play(MizukiTestAudioEnum.BGM_Arknight_Babel2, AudioMixerGroupEnum.BGM, AudioPlayMod.Loop);
         });
     }
 
