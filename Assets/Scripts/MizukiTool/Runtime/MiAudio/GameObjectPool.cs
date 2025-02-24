@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MizukiTool.MiAudio
 {
-    public class GameObjectPool
+    internal class GameObjectPool
     {
         GameObject mRoot;
         GameObject mEnabled;

@@ -1,9 +1,10 @@
+/*using System;
 using UnityEngine;
 using UnityEngine.Audio;
 
 namespace MizukiTool.MiAudio
 {
-    public class AudioMixerGroupContext
+    public class AudioMixerGroupContext<T> where T : Enum
     {
         /// <summary>
         /// 混音器
@@ -56,7 +57,7 @@ namespace MizukiTool.MiAudio
             if (mAudioMixerGroup == null || mVolume == v)
                 return;
             mVolume = Mathf.Clamp01(v);
-            float dbVolume = mVolume > 0 ? AudioMixerGroupManager.DBMin + AudioMixerGroupManager.DBRange * v : -80;
+            float dbVolume = mVolume > 0 ? AudioMixerGroupManager<T>.DBMin + AudioMixerGroupManager<T>.DBRange * v : -80;
             mAudioMixer.SetFloat(mVolumeName, dbVolume);
         }
         /// <summary>
@@ -71,9 +72,9 @@ namespace MizukiTool.MiAudio
             {
                 float dbVolume = 0;
                 mAudioMixer.GetFloat(mVolumeName, out dbVolume);
-                mVolume = (AudioMixerGroupManager.DBMax - dbVolume) / AudioMixerGroupManager.DBRange;
+                mVolume = (AudioMixerGroupManager<T>.DBMax - dbVolume) / AudioMixerGroupManager<T>.DBRange;
             }
             return mVolume;
         }
     }
-}
+}*/

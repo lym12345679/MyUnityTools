@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c5b4c4d484d0f43b6c3f5d047f7773, type: 3}
-  m_Name: AudioMixerSO
+  m_Script: {fileID: 11500000, guid: 07464a93132b340409b8302645a326a1, type: 3}
+  m_Name: TestAudioMixerGroupSO
   m_EditorClassIdentifier: 
   audioMixerList:
   - Name: BGM
