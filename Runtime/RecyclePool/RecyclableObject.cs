@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 namespace MizukiTool.RecyclePool
@@ -29,11 +27,14 @@ namespace MizukiTool.RecyclePool
             recycleTick += Time.fixedDeltaTime;
             if (recycleTick >= AutoRecycleTime)
             {
-                //todo:回收该物体
                 //Debug.Log("RecycleObject");
-                RecyclePoolUtil.CollectRecycleObject(this.gameObject, this);
+                CollectRecycleObject(this.gameObject, this);
                 recycleTick = 0;
             }
+        }
+        protected virtual void CollectRecycleObject(GameObject go, RecyclableObject controller)
+        {
+            RecyclePoolUtil.CollectRecycleObject(go, controller);
         }
     }
 
