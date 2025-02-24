@@ -1,5 +1,5 @@
 
-namespace MizukiTool.MiAudio
+namespace MizukiTool.Test.MiAudio
 {
     public enum MizukiTestAudioEnum
     {

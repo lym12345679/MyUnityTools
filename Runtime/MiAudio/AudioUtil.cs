@@ -6,23 +6,18 @@ namespace MizukiTool.MiAudio
 {
     public static class AudioUtil
     {
-        /// <summary>
-        /// 音响
-        /// </summary>
-        public static AudioMixerGroupSO audioMixerGroupSO = Resources.Load<AudioMixerGroupSO>("TestAudioClip/AudioMixerSO");
+        private static Action registerAction;
 
-        /// 音效存储参考方式
-        public static MizukiTestAudioSO audioSO = Resources.Load<MizukiTestAudioSO>("TestAudioClip/AudioSO");
         /// <summary>
         /// 注册所有的音效(配合RegisterAudioClip使用),在第一次调用音效时立刻触发
         /// </summary>
         private static void RegisterAllAudioClip()
         {
-            //Debug.Log("RegisterAllAudioClip");
-            foreach (var item in audioSO.audioList)
-            {
-                RegisterAudioClip(item.audioEnum, item.audioClip);
-            }
+            registerAction?.Invoke();
+        }
+        public static void SetRigisterAction(Action action)
+        {
+            registerAction = action;
         }
 
         /// <summary>
@@ -34,18 +29,26 @@ namespace MizukiTool.MiAudio
         /// <param name="endEventHander">播放结束时触发的事件</param>
         /// <param name="fixedUpdateEventHander">更新时触发的事件</param>
         /// <returns></returns>
-        public static long Play(MizukiTestAudioEnum audioEnum, AudioMixerGroupEnum audioMixerGroupEnum, AudioPlayMod audioPlayMod, Action<AudioPlayContext> endEventHander = null, Action<AudioPlayContext> fixedUpdateEventHander = null)
+        public static long Play<T1, T2>
+        (
+            AudioMixerGroupSO<T2> audioMixerGroupSO,
+            T1 audioEnum,
+            T2 audioMixerGroupEnum,
+            AudioPlayMod audioPlayMod,
+            Action<AudioPlayContext> endEventHander = null,
+            Action<AudioPlayContext> fixedUpdateEventHander = null
+        ) where T1 : Enum where T2 : Enum
         {
             EnsureInstance();
-            return AudioManager.Instance.Play(audioEnum, audioMixerGroupEnum, audioPlayMod, endEventHander, fixedUpdateEventHander);
+            return AudioManager.Instance.Play(audioMixerGroupSO, audioEnum, audioMixerGroupEnum, audioPlayMod, endEventHander, fixedUpdateEventHander);
         }
         /// <summary>
         /// 设置音量
         /// </summary>
         /// <param name="audioMixerEnum">音响对应的枚举</param>
         /// <param name="volume">设置值(0~1)</param>
-        public static void SetAudioVolume(AudioMixerGroupEnum audioMixerEnum, float volume)
-            => AudioMixerGroupManager.SetAudioVolume(audioMixerEnum, volume);
+        public static void SetAudioVolume<T>(T audioMixerEnum, float volume, AudioMixerGroup entry) where T : Enum
+            => AudioMixerGroupManager<T>.SetAudioVolume(audioMixerEnum, volume, entry);
         /// <summary>
         /// 暂停所有正在循环播放的音效
         /// </summary>
@@ -75,7 +78,7 @@ namespace MizukiTool.MiAudio
         /// </summary>
         /// <param name="audioEnum">该音效所对应的枚举</param>
         /// <returns></returns>
-        public static bool CheckEnumInLoopAudio(MizukiTestAudioEnum audioEnum)
+        public static bool CheckEnumInLoopAudio<T>(T audioEnum) where T : Enum
         {
             EnsureInstance();
             return AudioManager.Instance.CheckEnumInLoopAudio(audioEnum);
@@ -84,7 +87,7 @@ namespace MizukiTool.MiAudio
         /// <summary>
         /// 注册单个音效
         /// </summary>
-        private static void RegisterAudioClip<T>(T audioEnum, AudioClip audioClip) where T : Enum
+        public static void RegisterAudioClip<T>(T audioEnum, AudioClip audioClip) where T : Enum
         {
             AudioManager.Instance.RegisterOneAudioClip(audioEnum, audioClip);
         }
@@ -96,10 +99,6 @@ namespace MizukiTool.MiAudio
             }
         }
     }
-    public enum AudioMixerGroupEnum
-    {
-        Master,
-        BGM,
-        Effect
-    }
+
+
 }

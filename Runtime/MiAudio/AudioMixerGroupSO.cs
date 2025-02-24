@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEngine.Audio;
 namespace MizukiTool.MiAudio
 {
-    [CreateAssetMenu(fileName = "AudioMixerSO", menuName = "MizukiTool/AudioMixerSO")]
-    public class AudioMixerGroupSO : ScriptableObject
+    /// <summary>
+    /// 音频混合器组容器
+    /// </summary> 
+    public class AudioMixerGroupSO<T> : ScriptableObject where T : Enum
     {
-        public List<AudioMixerClass> audioMixerList = new List<AudioMixerClass>();
+        public List<AudioMixerClass<T>> audioMixerList = new List<AudioMixerClass<T>>();
         private void OnValidate()
         {
             foreach (var item in audioMixerList)
@@ -15,11 +17,16 @@ namespace MizukiTool.MiAudio
                 item.Name = item.audioMixerEnum.ToString();
             }
         }
-        public AudioMixerGroup GetAudioMixerGroup(AudioMixerGroupEnum audioMixerEnum)
+        /// <summary>
+        /// 获取指定AudioMixerGroup
+        /// </summary>
+        /// <param name="audioMixerEnum"></param>
+        /// <returns></returns>
+        public AudioMixerGroup GetAudioMixerGroup(T audioMixerEnum)
         {
             foreach (var item in audioMixerList)
             {
-                if (item.audioMixerEnum == audioMixerEnum)
+                if (item.audioMixerEnum.ToString() == audioMixerEnum.ToString())
                 {
                     return item.audioMixerGroup;
                 }
@@ -28,11 +35,11 @@ namespace MizukiTool.MiAudio
         }
     }
     [Serializable]
-    public class AudioMixerClass
+    public class AudioMixerClass<T> where T : Enum
     {
         [HideInInspector]
         public string Name;
-        public AudioMixerGroupEnum audioMixerEnum;
+        public T audioMixerEnum;
         public AudioMixerGroup audioMixerGroup;
     }
 

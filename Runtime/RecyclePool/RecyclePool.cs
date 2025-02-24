@@ -38,7 +38,7 @@ namespace MizukiTool.RecyclePool
             GetComponentDic().Add(context.id, new Stack<RecyclableObject>());
         }
         //检查是否存在该回收物
-        public bool CheckIdentifer<T>(T id) where T : Enum
+        internal bool CheckIdentifer<T>(T id) where T : Enum
         {
             identifier.SetEnum(id);
             if (GetContextDic().TryGetValue(identifier.GetID(), out RecycleContext context))
@@ -49,7 +49,7 @@ namespace MizukiTool.RecyclePool
             return false;
         }
         //创建一个回收物
-        public GameObject Create<T>(T id) where T : Enum
+        internal GameObject Create<T>(T id) where T : Enum
         {
             identifier.SetEnum<T>(id);
             RecycleContext context = GetContextDic()[identifier.GetID()];
@@ -68,7 +68,7 @@ namespace MizukiTool.RecyclePool
         }
 
         //请求一个回收物
-        public void Request<T>(T id, Action<RecycleCollection> hander = null, Transform parent = null) where T : Enum
+        internal void Request<T>(T id, Action<RecycleCollection> hander = null, Transform parent = null) where T : Enum
         {
             //Debug.Log("Request");
             GameObject target;
@@ -115,7 +115,7 @@ namespace MizukiTool.RecyclePool
             }
         }
         //回收一个回收物
-        public void CollectRecycleObject(GameObject go, RecyclableObject controller)
+        internal void CollectRecycleObject(GameObject go, RecyclableObject controller)
         {
             EnsureSceneRecycleGuardExist();
             go.SetActive(false);
@@ -132,7 +132,7 @@ namespace MizukiTool.RecyclePool
             GetComponentDic()[controller.id].Push(controller);
             go.transform.SetParent(SceneRecycleGuard.Instance.transform);
         }
-        public void ReturnToPool(GameObject go)
+        internal void ReturnToPool(GameObject go)
         {
             RecyclableObject controller;
             if (go.TryGetComponent<RecyclableObject>(out controller))
@@ -147,7 +147,7 @@ namespace MizukiTool.RecyclePool
         }
         #region 确认是否存在        
 
-        public void EnsureSceneRecycleGuardExist()
+        internal void EnsureSceneRecycleGuardExist()
         {
             if (SceneRecycleGuard.Instance == null)
             {

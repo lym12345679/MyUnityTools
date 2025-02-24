@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 namespace MizukiTool.MiAudio
 {
-    public class AudioManager : MonoBehaviour
+    internal class AudioManager : MonoBehaviour
     {
         /// <summary>
         /// 单体实例
@@ -226,14 +227,22 @@ namespace MizukiTool.MiAudio
             }
         }
         //播放音效，返回使用的容器ID
-        public long Play<T>(T audioEnum, AudioMixerGroupEnum audioMixerGroupEnum, AudioPlayMod audioPlayMod, Action<AudioPlayContext> endEventHander = null, Action<AudioPlayContext> updateEventHander = null) where T : Enum
+        public long Play<T1, T2>
+        (
+            AudioMixerGroupSO<T2> audioMixerGroupSO,
+            T1 audioEnum,
+            T2 audioMixerGroupEnum,
+            AudioPlayMod audioPlayMod,
+            Action<AudioPlayContext> endEventHander = null,
+            Action<AudioPlayContext> updateEventHander = null
+            ) where T1 : Enum where T2 : Enum
         {
             EnsureInstance();
             AudioPlayContext audioPlayContext = GetAudioPlayContext();
             mEnumIdentifier.SetEnum(audioEnum);
 
             audioPlayContext.TargetAudioSource.clip = mAudioClipDic[mEnumIdentifier.GetID()];
-            audioPlayContext.TargetAudioSource.outputAudioMixerGroup = AudioMixerGroupManager.GetAudioMixerGroup(audioMixerGroupEnum);
+            audioPlayContext.TargetAudioSource.outputAudioMixerGroup = audioMixerGroupSO.GetAudioMixerGroup(audioMixerGroupEnum);
             if (endEventHander != null)
             {
                 audioPlayContext.SetEndHander(endEventHander);
@@ -291,7 +300,7 @@ namespace MizukiTool.MiAudio
         /// </summary>
         /// <param name="audioEnum"></param>
         /// <returns></returns>
-        public bool CheckEnumInLoopAudio(MizukiTestAudioEnum audioEnum)
+        public bool CheckEnumInLoopAudio<T>(T audioEnum) where T : Enum
         {
             mEnumIdentifier.SetEnum(audioEnum);
             string audioEnumID = mEnumIdentifier.GetID();
