@@ -11,7 +11,7 @@ namespace MizukiTool.UIEffect
             .SetEffectMode(ScaleEffectMode.PingPong)
             .SetEndHandler((effect) =>
             {
-                Debug.Log("End");
+                //Debug.Log("End");
             })
             .SetPercentageHandler((t) =>
             {

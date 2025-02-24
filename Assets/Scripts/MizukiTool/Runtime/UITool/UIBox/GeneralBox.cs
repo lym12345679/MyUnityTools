@@ -18,11 +18,14 @@ namespace MizukiTool.Box
         /// <returns>创建的GameObject实例</returns>
         public static GameObject Open(T2 param)
         {
-            return BoxManager.OpenBox<T1, T2, T3>(param);
+            return BoxManager.Instance.OpenBox<T1, T2, T3>(param);
         }
+        /// <summary>
+        /// 关闭UI
+        /// </summary>
         public virtual void Close()
         {
-            BoxManager.CloseBox<T1, T2, T3>(this.BoxID);
+            BoxManager.Instance.CloseBox<T1, T2, T3>(this.BoxID);
         }
 
         public virtual void GetParams(T2 param)

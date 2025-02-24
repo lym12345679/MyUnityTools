@@ -13,10 +13,10 @@ namespace MizukiTool.UIEffect
             SetFadeMode(FadeMode.Loop).
             SetFadeDelay(2).SetEndHander((fade) =>
             {
-                Debug.Log("loopCount:" + fade.GetLoopCount());
+                //Debug.Log("loopCount:" + fade.GetLoopCount());
                 fade.ChangeOriginalColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)));
                 fade.ChangeFinalColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)));
-                Debug.Log("End");
+                //Debug.Log("End");
             });
         private Image image;
         private FadeEffect<Image> fade2;

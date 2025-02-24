@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MizukiTool.RecyclePool;
 using UnityEngine;
-namespace MizukiTool.Test
+namespace MizukiTool.Test.TestRecyclePool
 {
     public class RecycleTest : MonoBehaviour
     {
@@ -21,10 +21,10 @@ namespace MizukiTool.Test
             if (TimeTick >= Time)
             {
                 TimeTick = 0;
-                /*RecyclePoolUtil.Request(MyTestEnum.MyTestEnum1, (collection) =>
+                TestRecyclePoolUtil.Request(TestRecyclePoolEnum.TestRecyclePoolEnum1, (collection) =>
                     {
                         collection.GameObject.transform.position = new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0);
-                    });*/
+                    });
             }
         }
 

@@ -1,13 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-namespace MizukiTool.Box
+namespace MizukiTool.Test.Box
 {
-    public class MessageBox : GeneralBox<MessageBox, Message, string>
+    public class MessageBox : TestGeneralBox<MessageBox, Message, string>
     {
-        public TextMeshProUGUI title;
-        public TextMeshProUGUI content;
         public override void GetParams(Message param)
         {
             this.param = param;
@@ -18,8 +13,8 @@ namespace MizukiTool.Box
         }
         void Start()
         {
-            title.text = param.title;
-            content.text = param.content;
+            Debug.Log("GetTitle:" + param.title);
+            Debug.Log("GetContent:" + param.content);
         }
     }
     public class Message
