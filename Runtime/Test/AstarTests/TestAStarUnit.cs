@@ -71,7 +71,7 @@ namespace MizukiTool.AStar
         // Start is called before the first frame update
         void Start()
         {
-            if (((IAstar)this).TryFindPath())
+            if (((IAstar)this).TryFindPath(2))
             {
                 Debug.Log("Find Path");
             }
@@ -79,7 +79,7 @@ namespace MizukiTool.AStar
 
         void FixedUpdate()
         {
-            ((IAstar)this).AutoMove();
+            ((IAstar)this).AutoMove(2);
             AstarManager.Instance.path = path;
         }
     }
