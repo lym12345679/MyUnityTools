@@ -11,7 +11,7 @@ namespace MizukiTool.AStar
         public float RefreshTick { get => refreshTick; set => refreshTick = value; }
         void FixedUpdate()
         {
-            ((IAstarVectorTarget)this).CreatAstarVector();
+            ((IAstarVectorTarget)this).CreatAstarVector(2);
         }
     }
 
