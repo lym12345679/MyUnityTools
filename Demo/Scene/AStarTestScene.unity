@@ -548,7 +548,7 @@ MonoBehaviour:
   RefreshInterval: 1
   ShowMapLableGizmos: 1
   ShowPathLableGizmos: 1
-  ShowPathTarget: {fileID: 0}
+  ShowPathTarget: {fileID: 949951438}
 --- !u!1 &1267690929
 GameObject:
   m_ObjectHideFlags: 0
