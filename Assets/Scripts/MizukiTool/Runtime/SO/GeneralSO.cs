@@ -23,7 +23,20 @@ namespace MizukiTool.GeneralSO
                     return item.Value2;
                 }
             }
-            return default(T2);
+            return default;
+        }
+        public bool TryGetValueByKey(T1 key, out T2 value)
+        {
+            foreach (var item in SelfList)
+            {
+                if (item.EnumValue.Equals(key))
+                {
+                    value = item.Value2;
+                    return true;
+                }
+            }
+            value = default;
+            return false;
         }
         void OnValidate()
         {
