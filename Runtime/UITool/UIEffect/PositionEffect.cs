@@ -5,7 +5,6 @@ namespace MizukiTool.UIEffect
     public class PositionEffect
     {
         private Transform targetTransform;
-        public delegate float EffectPercentageHandler(float t);
         public PositionEffect()
         {
             duration = 0;
@@ -25,7 +24,7 @@ namespace MizukiTool.UIEffect
         private PositionEffectMode effectMode;
         private int effectPingPongCount;
         private bool isEffectFinish;
-        private EffectPercentageHandler effectPercentageHandler;
+        private Func<float, float> effectPercentageHandler;
         private Action<PositionEffect> effectEndHandler;
         private bool isPause;
         private bool isFinishImmediately;
@@ -149,7 +148,7 @@ namespace MizukiTool.UIEffect
         /// 设置位移百分比处理器
         /// </summary>
         /// <param name="positionEffectPercentageHandler">输入为当前线性位移百分比,输出为修改后的百分比</param>
-        public PositionEffect SetPercentageHandler(EffectPercentageHandler positionEffectPercentageHandler)
+        public PositionEffect SetPercentageHandler(Func<float, float> positionEffectPercentageHandler)
         {
             this.effectPercentageHandler = positionEffectPercentageHandler;
             return this;

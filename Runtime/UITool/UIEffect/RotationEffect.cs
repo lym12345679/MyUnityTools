@@ -7,7 +7,6 @@ namespace MizukiTool.UIEffect
     public class RotationEffect
     {
         private Transform targetTransform;
-        public delegate float EffectPercentageHandler(float t);
         public RotationEffect()
         {
             duration = 0;
@@ -27,7 +26,7 @@ namespace MizukiTool.UIEffect
         private RotationEffectMode effectMode;
         private int effectPingPongCount;
         private bool isEffectFinish;
-        private EffectPercentageHandler effectPercentageHandler;
+        private Func<float, float> effectPercentageHandler;
         private Action<RotationEffect> effectEndHandler;
         private bool isPause;
         private bool isFinishImmediately;
@@ -148,7 +147,7 @@ namespace MizukiTool.UIEffect
         /// 设置缩放百分比处理器
         /// </summary>
         /// <param name="RotationEffectPercentageHandler">输入为当前线性缩放百分比,输出为修改后的百分比</param>
-        public RotationEffect SetPercentageHandler(EffectPercentageHandler RotationEffectPercentageHandler)
+        public RotationEffect SetPercentageHandler(Func<float, float> RotationEffectPercentageHandler)
         {
             this.effectPercentageHandler = RotationEffectPercentageHandler;
             return this;

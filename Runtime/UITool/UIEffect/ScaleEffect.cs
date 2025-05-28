@@ -6,7 +6,6 @@ namespace MizukiTool.UIEffect
     public class ScaleEffect
     {
         private Transform targetTransform;
-        public delegate float EffectPercentageHandler(float t);
         public ScaleEffect()
         {
             duration = 0;
@@ -26,7 +25,7 @@ namespace MizukiTool.UIEffect
         private ScaleEffectMode effectMode;
         private int effectPingPongCount;
         private bool isEffectFinish;
-        private EffectPercentageHandler effectPercentageHandler;
+        private Func<float, float> effectPercentageHandler;
         private Action<ScaleEffect> effectEndHandler;
         private bool isPause;
         private bool isFinishImmediately;
@@ -147,7 +146,7 @@ namespace MizukiTool.UIEffect
         /// 设置缩放百分比处理器
         /// </summary>
         /// <param name="ScaleEffectPercentageHandler">输入为当前线性缩放百分比,输出为修改后的百分比</param>
-        public ScaleEffect SetPercentageHandler(EffectPercentageHandler ScaleEffectPercentageHandler)
+        public ScaleEffect SetPercentageHandler(Func<float, float> ScaleEffectPercentageHandler)
         {
             this.effectPercentageHandler = ScaleEffectPercentageHandler;
             return this;
