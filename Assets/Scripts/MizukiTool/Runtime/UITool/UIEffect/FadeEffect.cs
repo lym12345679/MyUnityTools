@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 namespace MizukiTool.UIEffect
 {
-    public delegate float PercentageHandler(float percentage);
     public class FadeEffect<T> where T : Graphic
     {
 
@@ -106,7 +105,7 @@ namespace MizukiTool.UIEffect
         private bool isPause;
         private Action<FadeEffect<T>> endHander;
         private bool isFinishImmediately;
-        private PercentageHandler percentageHander;
+        private Func<float, float> percentageHander;
         public FadeEffect<T> Start(T target)
         {
             FadeEffect<T> copy = Copy(this);
@@ -194,7 +193,7 @@ namespace MizukiTool.UIEffect
         /// 设置缩放百分比处理器
         /// </summary>
         /// <param name="PercentageHandler">输入为当前线性缩放百分比,输出为修改后的百分比</param>
-        public FadeEffect<T> SetPersentageHander(PercentageHandler hander)
+        public FadeEffect<T> SetPersentageHander(Func<float, float> hander)
         {
             this.percentageHander = hander;
             return this;

@@ -5,7 +5,6 @@ namespace MizukiTool.UIEffect
 {
     public class FadeEffectGO<T> where T : Renderer
     {
-        public delegate float PercentageHandler(float percentage);
         public void UpdateFade()
         {
             if (isPause)
@@ -46,7 +45,7 @@ namespace MizukiTool.UIEffect
         private Color finalFadeColor;
         //循环次数
         private int loopCount;
-        private PercentageHandler percentageHander;
+        private Func<float, float> percentageHander;
         /// <summary>
         /// 设置渐变时间
         /// </summary>
@@ -99,7 +98,7 @@ namespace MizukiTool.UIEffect
         /// 设置缩放百分比处理器
         /// </summary>
         /// <param name="PercentageHandler">输入为当前线性缩放百分比,输出为修改后的百分比</param>
-        public FadeEffectGO<T> SetPersentageHander(PercentageHandler hander)
+        public FadeEffectGO<T> SetPersentageHander(Func<float, float> hander)
         {
             this.percentageHander = hander;
             return this;
