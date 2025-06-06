@@ -3,15 +3,16 @@ using UnityEngine;
 
 namespace MizukiTool.MiAudio
 {
-    internal class GameObjectPool
+    internal class AudioGameObjectPool
     {
-        GameObject mRoot;
-        GameObject mEnabled;
-        GameObject mDisabled;
-        int mTotal;
-        Stack<GameObject> mGOStack = new Stack<GameObject>();
+        private readonly Stack<AudioSource> mGOStack = new();
+        private GameObject mDisabled;
+        private GameObject mEnabled;
+        private GameObject mRoot;
+        private int mTotal;
+
         /// <summary>
-        /// 初始化
+        ///     初始化
         /// </summary>
         /// <param name="root"></param>
         public void Init(GameObject root)
@@ -23,31 +24,35 @@ namespace MizukiTool.MiAudio
             mDisabled = new GameObject("Disabled");
             mDisabled.transform.parent = mRoot.transform;
         }
+
         /// <summary>
-        /// 获取对象
+        ///     获取对象
         /// </summary>
         /// <returns></returns>
-        public GameObject Get()
+        public AudioSource Get()
         {
             if (mGOStack.Count == 0)
             {
                 mTotal++;
-                GameObject go = new GameObject("GOPool:" + mTotal.ToString());
+                var go = new GameObject("GOPool:" + mTotal);
+                var audioSource = go.AddComponent<AudioSource>();
                 AudioManager.DontDestroyOnLoad(go);
-                return go;
+                return audioSource;
             }
-            GameObject target = mGOStack.Pop();
-            target.SetActive(true);
+
+            var target = mGOStack.Pop();
+            target.gameObject.SetActive(true);
             return target;
         }
+
         /// <summary>
-        /// 归还对象
+        ///     归还对象
         /// </summary>
         /// <param name="go"></param>
-        public void Free(GameObject go)
+        public void Free(AudioSource go)
         {
             go.transform.parent = AudioManager.Instance.transform;
-            go.SetActive(false);
+            go.gameObject.SetActive(false);
             mGOStack.Push(go);
         }
     }
