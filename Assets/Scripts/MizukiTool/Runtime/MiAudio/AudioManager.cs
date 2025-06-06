@@ -44,19 +44,19 @@ namespace MizukiTool.MiAudio
         /// <summary>
         ///     音效播放对象池，用于在指定位置播放音效
         /// </summary>
-        private readonly GameObjectPool mAudioSourceObjectPool = new();
+        private readonly AudioGameObjectPool mAudioSourceObjectPool = new();
 
         private readonly EnumIdentifier mEnumIdentifier = new();
-
-        /// <summary>
-        ///     下个音效ID
-        /// </summary>
-        private long mNextAudioID = 1;
 
         /// <summary>
         ///     未使用的AudioPlayEntry
         /// </summary>
         private readonly List<AudioPlayContext> UnusedAudioPlayEntry = new();
+
+        /// <summary>
+        ///     下个音效ID
+        /// </summary>
+        private long mNextAudioID = 1;
 
         private void Start()
         {
@@ -83,7 +83,10 @@ namespace MizukiTool.MiAudio
         internal void RegisterOneAudioClip<T>(T audioEnum, AudioClip audioClip) where T : Enum
         {
             mEnumIdentifier.SetEnum(audioEnum);
-            mAudioClipDic.Add(mEnumIdentifier.GetID(), audioClip);
+            if (mAudioClipDic.ContainsKey(mEnumIdentifier.GetID()))
+                Debug.LogWarning($"AudioManager: AudioClip {mEnumIdentifier.GetID()} already exists.");
+            else
+                mAudioClipDic.Add(mEnumIdentifier.GetID(), audioClip);
         }
 
         /// <summary>
@@ -105,9 +108,9 @@ namespace MizukiTool.MiAudio
             if (UnusedAudioPlayEntry.Count == 0) CreatNewAudioPlayEntry();
             var audioPlayEntry = UnusedAudioPlayEntry[0];
             UnusedAudioPlayEntry.RemoveAt(0);
-            audioPlayEntry.Init();
+
             var go = mAudioSourceObjectPool.Get();
-            audioPlayEntry.SetTargetGO(go.transform);
+            audioPlayEntry.Init(go);
             return audioPlayEntry;
         }
 
@@ -117,8 +120,7 @@ namespace MizukiTool.MiAudio
             if (audioPlayEntry == null) return false;
             if (audioPlayEntry.TargetAudioSource.isPlaying) audioPlayEntry.TargetAudioSource.Stop();
             UnusedAudioPlayEntry.Add(audioPlayEntry);
-            mAudioSourceObjectPool.Free(audioPlayEntry.SelfTransform.gameObject);
-            audioPlayEntry.SetTargetGO(null);
+            mAudioSourceObjectPool.Free(audioPlayEntry.TargetAudioSource);
             return true;
         }
 
@@ -259,15 +261,81 @@ namespace MizukiTool.MiAudio
         //单例
         public static bool EnsureInstance()
         {
-            if (Instance == null)
-            {
-                var go = new GameObject("AudioManager");
-                Instance = go.AddComponent<AudioManager>();
-                return false;
-            }
-
-            return true;
+            if (!ReferenceEquals(Instance, null)) return true;
+            var go = new GameObject("AudioManager");
+            Instance = go.AddComponent<AudioManager>();
+            return false;
         }
+
+        #region 非循环音效处理
+
+        //暂停所有非循环音效
+        public void PauseAllNormalAudio()
+        {
+            for (var i = mAudioContextWaitFinish.Count - 1; i >= 0; i--)
+            {
+                var audioEntry = mAudioContextWaitFinish[i];
+                audioEntry.Pause();
+            }
+        }
+
+        //继续所有非循环音效
+        public void ContinueAllNormalAudio()
+        {
+            for (var i = mAudioContextWaitFinish.Count - 1; i >= 0; i--)
+            {
+                var audioEntry = mAudioContextWaitFinish[i];
+                audioEntry.UnPause();
+            }
+        }
+
+        //回收所有非循环音效
+        public void ReturnAllNormalAudio()
+        {
+            for (var i = mAudioContextWaitFinish.Count - 1; i >= 0; i--)
+            {
+                var audioEntry = mAudioContextWaitFinish[i];
+                mAudioContextDic.Remove(audioEntry.ID);
+                mAudioContextWaitFinish.Remove(audioEntry);
+                RetrunAudioPlayEntry(audioEntry);
+            }
+        }
+
+        //判断是否在非循环播放
+        public AudioClip CheckEnumInWaitAudio<T>(T audioEnum) where T : Enum
+        {
+            mEnumIdentifier.SetEnum(audioEnum);
+            var audioEnumID = mEnumIdentifier.GetID();
+            foreach (var audioEntry in mAudioContextWaitFinish)
+                if (audioEntry.TargetAudioSource.clip == mAudioClipDic[audioEnumID])
+                    return audioEntry.TargetAudioSource.clip;
+            return null;
+        }
+
+        /// <summary>
+        ///     根据枚举回收非循环音效
+        /// </summary>
+        /// <param name="audioEnum"></param>
+        /// <typeparam name="T"></typeparam>
+        public void ReturnNormalAudioByEnum<T>(T audioEnum) where T : Enum
+        {
+            mEnumIdentifier.SetEnum(audioEnum);
+            var audioEnumID = mEnumIdentifier.GetID();
+            for (var i = mAudioContextWaitFinish.Count - 1; i >= 0; i--)
+            {
+                var audioEntry = mAudioContextWaitFinish[i];
+                if (audioEntry.TargetAudioSource.clip == mAudioClipDic[audioEnumID])
+                {
+                    mAudioContextDic.Remove(audioEntry.ID);
+                    mAudioContextWaitFinish.Remove(audioEntry);
+                    RetrunAudioPlayEntry(audioEntry);
+                }
+            }
+        }
+
+        #endregion
+
+        #region 循环音效处理
 
         //暂停所有循环音效
         public void PauseAllLoopAudio()
@@ -306,27 +374,48 @@ namespace MizukiTool.MiAudio
         /// </summary>
         /// <param name="audioEnum"></param>
         /// <returns></returns>
-        public bool CheckEnumInLoopAudio<T>(T audioEnum) where T : Enum
+        public AudioClip CheckEnumInLoopAudio<T>(T audioEnum) where T : Enum
         {
             mEnumIdentifier.SetEnum(audioEnum);
             var audioEnumID = mEnumIdentifier.GetID();
             foreach (var audioEntry in mAudioEntryInLoop)
                 if (audioEntry.TargetAudioSource.clip == mAudioClipDic[audioEnumID])
-                    return true;
-
-            return false;
+                    return audioEntry.TargetAudioSource.clip;
+            return null;
         }
+
+        /// <summary>
+        ///     根据枚举回收循环音效
+        /// </summary>
+        /// <param name="audioEnum"></param>
+        /// <typeparam name="T"></typeparam>
+        public void ReturnLoopAudioByEnum<T>(T audioEnum) where T : Enum
+        {
+            mEnumIdentifier.SetEnum(audioEnum);
+            var audioEnumID = mEnumIdentifier.GetID();
+            for (var i = mAudioEntryInLoop.Count - 1; i >= 0; i--)
+            {
+                var audioEntry = mAudioEntryInLoop[i];
+                if (audioEntry.TargetAudioSource.clip == mAudioClipDic[audioEnumID])
+                {
+                    mAudioContextDic.Remove(audioEntry.ID);
+                    mAudioEntryInLoop.Remove(audioEntry);
+                    RetrunAudioPlayEntry(audioEntry);
+                }
+            }
+        }
+
+        #endregion
     }
 
+    /// <summary>
+    ///     Audio数据
+    /// </summary>
     public class AudioPlayContext
     {
         public readonly long ID;
-
-        //播放结束时的处理
-        public Action<AudioPlayContext> endHander;
-
-        //播放刷新时的处理
-        public Action<AudioPlayContext> fixedUpdateHander;
+        private Action<AudioPlayContext> endHandler;
+        private Action<AudioPlayContext> fixedUpdateHandler;
         private bool isPlaying;
         private AudioSource targetAudioSource;
         public AudioPlayMod TheAudioPlayMod;
@@ -335,8 +424,8 @@ namespace MizukiTool.MiAudio
         {
             this.ID = ID;
             SelfTransform = null;
-            endHander = null;
-            fixedUpdateHander = null;
+            endHandler = null;
+            fixedUpdateHandler = null;
             TheAudioPlayMod = AudioPlayMod.Normal;
         }
 
@@ -356,18 +445,20 @@ namespace MizukiTool.MiAudio
             }
         }
 
-        //绑定的物体
-        public Transform SelfTransform { get; private set; }
+        public Transform SelfTransform { get; }
 
-        public void Init()
+        public void Init(AudioSource audioSource)
         {
-            SelfTransform = null;
-            endHander = null;
-            fixedUpdateHander = null;
+            endHandler = null;
+            fixedUpdateHandler = null;
             TheAudioPlayMod = AudioPlayMod.Normal;
+            targetAudioSource = audioSource;
             if (ReferenceEquals(targetAudioSource, null)) return;
             targetAudioSource.volume = 1;
             targetAudioSource.pitch = 1;
+            targetAudioSource.enabled = true;
+            targetAudioSource.loop = false;
+            targetAudioSource.mute = false;
         }
 
         public AudioPlayContext SetPosition(Vector3 position)
@@ -376,27 +467,22 @@ namespace MizukiTool.MiAudio
             return this;
         }
 
-        public AudioPlayContext SetTargetGO(Transform targetGO)
-        {
-            SelfTransform = targetGO;
-            return this;
-        }
 
         public AudioPlayContext SetEndHander(Action<AudioPlayContext> endHander)
         {
-            this.endHander = endHander;
+            endHandler = endHander;
             return this;
         }
 
         public AudioPlayContext SetUpdateHander(Action<AudioPlayContext> updateHander)
         {
-            fixedUpdateHander = updateHander;
+            fixedUpdateHandler = updateHander;
             return this;
         }
 
         public void Play()
         {
-            if (!ReferenceEquals(SelfTransform,null)) TargetAudioSource.transform.position = SelfTransform.position;
+            if (!ReferenceEquals(SelfTransform, null)) TargetAudioSource.transform.position = SelfTransform.position;
             isPlaying = true;
             TargetAudioSource.Play();
         }
@@ -447,12 +533,12 @@ namespace MizukiTool.MiAudio
 
         public void OnAudioEnd()
         {
-            if (endHander != null) endHander(this);
+            if (endHandler != null) endHandler(this);
         }
 
         public void OnUpdate()
         {
-            if (fixedUpdateHander != null) fixedUpdateHander(this);
+            if (fixedUpdateHandler != null) fixedUpdateHandler(this);
             if (!TargetAudioSource.isPlaying) isPlaying = false;
         }
 
@@ -460,6 +546,12 @@ namespace MizukiTool.MiAudio
         {
             return isPlaying;
         }
+
+        //播放结束时的处理
+
+        //播放刷新时的处理
+
+        //绑定的物体
     }
 
     public enum AudioPlayMod
