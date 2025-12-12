@@ -40,7 +40,7 @@ namespace MizukiTool.RecyclePool
         private static void EnsureContextExist()
         {
             if (isPrefabRegistered) return;
-            RigisterAllPrefab(recyclePool);
+            RigisterAllPrefab();
         }
 
         public static void SetRigisterAction(Action<RecyclePool> action)
@@ -53,7 +53,7 @@ namespace MizukiTool.RecyclePool
         ///     参考格式:recyclePool.RigisterOnePrefab(TargetEnum, TargetPrefab);
         ///     etc:recyclePool.RigisterOnePrefab(MyTestEnum.MyTestEnum1, Resources.Load<GameObject>("Prefab/Recycle/RecycleGO"));
         /// </summary>
-        public static void RigisterAllPrefab(RecyclePool recyclePool)
+        public static void RigisterAllPrefab()
         {
             isPrefabRegistered = true;
             rigisterAction?.Invoke(recyclePool);
